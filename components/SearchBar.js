@@ -1,8 +1,8 @@
 import React from 'react';
 import { View, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
-import { Feather } from '@expo/vector-icons';
+import { Feather, Entypo  } from '@expo/vector-icons';
 
-export default function SearchBar({ city, setCity, onSearch }) {
+export default function SearchBar({ city, setCity, onSearch, onUseLocation  }) {
   return (
     <View style={styles.searchContainer}>
       <TextInput
@@ -16,6 +16,9 @@ export default function SearchBar({ city, setCity, onSearch }) {
       />
       <TouchableOpacity style={styles.button} onPress={onSearch}>
         <Feather name="search" size={22} color="#fff" />
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.button} onPress={onUseLocation}>
+        <Entypo name="location-pin" size={22} color="#fff" />
       </TouchableOpacity>
     </View>
   );
@@ -37,12 +40,13 @@ const styles = StyleSheet.create({
     fontSize: 16,
     backgroundColor: 'rgba(255,255,255,0.15)',
     color: '#fff',
-    marginRight: 10,
+    marginRight: 6,
   },
   button: {
     width: 50,
     height: 50,
     alignItems: 'center',
+    marginLeft: 4,
     justifyContent: 'center',
     backgroundColor: 'rgba(255,255,255,0.2)',
     borderRadius: 12,

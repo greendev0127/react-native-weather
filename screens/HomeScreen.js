@@ -1,11 +1,15 @@
 import React, { useState } from 'react';
 import { StyleSheet, Text, View, ActivityIndicator, StatusBar, ScrollView, Keyboard } from 'react-native';
+
+import * as Location from 'expo-location';
 import { LinearGradient } from 'expo-linear-gradient';
+
 import SearchBar from '../components/SearchBar';
 import WeatherCard from '../components/WeatherCard';
-import WeatherDetails from '../components/WeatherDetails';
 import ForecastList from '../components/ForecastList';
-import { getWeatherByCity, getForecastByCity } from '../utils/api';
+import WeatherDetails from '../components/WeatherDetails';
+
+import { getWeatherByCity, getForecastByCity, getWeatherByCoords, getForecastByCoords } from '../utils/api';
 
 export default function HomeScreen() {
   const [city, setCity] = useState('');
@@ -52,6 +56,40 @@ export default function HomeScreen() {
     setLoading(false);
   };
 
+  const fetchWeatherByLocation = async () => {
+    setLoading(true);
+    setError('');
+    setWeather(null);
+    setForecast(null);
+    try {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        setError('Permission to access location was denied.');
+        setLoading(false);
+        return;
+      }
+      let location = await Location.getCurrentPositionAsync({});
+      const { latitude, longitude } = location.coords;
+  
+      const data = await getWeatherByCoords(latitude, longitude);
+      if (data.cod === 200) {
+        setWeather(data);
+        setCity(data.name); // Optionally update city input
+        const forecastData = await getForecastByCoords(latitude, longitude);
+        if (forecastData.cod === "200") {
+          setForecast(forecastData);
+        } else {
+          setForecast(null);
+        }
+      } else {
+        setError(data.message || 'Could not fetch weather for your location.');
+      }
+    } catch (err) {
+      setError('Unable to get location or weather data.');
+    }
+    setLoading(false);
+  };
+
   return (
     <LinearGradient
       colors={weather ? getWeatherGradient(weather.main.temp) : ['#4f8cff', '#003366']}
@@ -64,7 +102,7 @@ export default function HomeScreen() {
         showsVerticalScrollIndicator={false}
       >
         <Text style={styles.title}>Weatherly</Text>
-        <SearchBar city={city} setCity={setCity} onSearch={fetchWeather} />
+        <SearchBar city={city} setCity={setCity} onSearch={fetchWeather} onUseLocation={fetchWeatherByLocation} />
         {loading && (
           <ActivityIndicator
             size="large"
