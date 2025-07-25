@@ -176,20 +176,7 @@ export default function HomeScreen() {
         {error ? <Text style={styles.error}>{error}</Text> : null}
         {weather && (
           <>
-            <WeatherCard weather={weather} />
-            <TouchableOpacity
-              style={{
-                alignSelf: "center",
-                marginTop: 10,
-                marginBottom: 5,
-                backgroundColor: "rgba(225,0,0,0.18)",
-                borderRadius: 20,
-                padding: 8,
-              }}
-              onPress={handleAddFavorite}
-            >
-              <Feather name="heart" size={22} color="#fff" />
-            </TouchableOpacity>
+            <WeatherCard weather={weather} handleAddFavorite={handleAddFavorite} />
             <WeatherDetails weather={weather} />
             <ForecastList forecast={forecast} />
           </>
